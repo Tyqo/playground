@@ -1,0 +1,18 @@
+html {
+	@include fluid-type(font-size, $tablet-portrait-breakpoint, $desktop-breakpoint, 11px, 22px);
+}
+
+body {
+	@include type-setting(0);
+	color: $text-color;
+}
+
+.headline {
+	font-size: 2.9rem;
+	line-height: 1.42;
+	// @include type-setting(2);
+}
+
+.copy-text {
+	@include type-setting(0);
+}

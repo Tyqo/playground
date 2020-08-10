@@ -1,0 +1,53 @@
+/**
+ * partials/_common.scss
+ *
+ * Common styles, like e.g. resets, basic styles...
+ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	// background: hotpink;
+	font-family: sans-serif;
+	font-variant-ligatures: common-ligatures;
+
+	display: flex;
+	flex-flow: column;
+	min-height: 100vh;
+	
+	font-kerning: normal;
+	-webkit-font-kerning: normal;
+	font-smooth: always;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background: $black;
+}
+
+.main-content {
+	margin-bottom: auto;
+}
+
+.visualy-hidden {
+	display: block;
+	opacity: 0;
+	color: transparent;
+	width: 2px;
+	height: 2px;
+	margin: -1px;
+}
+
+.main-header {
+	background: grey;
+	padding: $gutter*1.5;
+	display: flex;
+	
+	> * {
+		margin: auto;
+	}
+}
