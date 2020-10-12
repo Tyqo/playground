@@ -76,7 +76,7 @@ var svgoOptions = {
 var settings = {
 
 	browserSync: {
-		proxy:'https://' + pkg.name + '.dick.localhost',
+		proxy:'https://' + pkg.name + '.carstencoull.localhost',
 		open: false,	// Don't open browser, change to "local" if you want or see https://browsersync.io/docs/options#option-open
 		notify: false,	// Don't notify on every change
 		https:  {
@@ -376,7 +376,7 @@ function checkKey() {
 		console.log('https');
 	} catch (err) {
 		settings.browserSync.https = null;
-		settings.browserSync.proxy = 'http://' + pkg.name + '.dick.localhost';
+		settings.browserSync.proxy = 'http://' + pkg.name + '.carstencoull.localhost';
 		console.error(err);
 	}
 }

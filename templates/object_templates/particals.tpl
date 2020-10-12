@@ -2,7 +2,9 @@
 	<canvas id="js-particals" width="300" height="300"></canvas>
 </div>
 
-<div class="control">
+<!-- <img id="source" src="https://www.agentur-halma.de/dist/img/blazon_icon.png" alt=""> -->
+
+<!-- <div class="control">
 	<div class="control-text">
 		<label for="control-text__input">type some in text</label>
 		<input id="control-text__input" type="text" name="" value="">
@@ -47,4 +49,4 @@
 		<label for="control-lineMin__input">Min Line distance</label>
 		<input type="range" min="1" max="50" value="1" class="slider" id="control-lineMin__input">
 	</div>
-</div>
+</div> -->

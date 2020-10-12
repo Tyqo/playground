@@ -3,244 +3,214 @@ function Particles(app) {
 	self.app = app;
 
 	// parameters
-	
+
 	let particaleArray = [];
 	let ctx = null;
 	let canvas = null;
 	let box = null;
 	let imageData;
-	var textField;
+
+	var scale = 7;
+	var maxDensity = 12;
+	var maxSize = 0.5;
+
+	var alphaLimit = 128;
+	var maxLineDistance = 2.5;
+	var minLineDistance = 2;
 	
-	var offsetX;
-	var offsetY;
-	var scale = 6;
-	var textSize = 50;
-	var maxDensity = 42;
-	var maxSize = 3;
-	var color = '#ffffff';
-	var axisX = 0;
-	var axisY = 12;
-	
-	var alphaLimit = 64;
-	var maxLineDistance = 18;
-	var minLineDistance = 10;
-	var isPlaying = true;
-	var hasStopped = false;
-	var text = 'halma';
+	var imageWidth;
+	var imageHeight;
+	// var imageSource = 'https://www.agentur-halma.de/dist/img/blazon_icon.png';
+	var imageSource = '/dist/img/blazon_icon.png';
+
+	var delay = 1000;
+	var resizeCounter = 0;
+	var callCounter = 0;
+
+	// var textField;
+	// var textSize = 50;
+	// var isPlaying = true;
+	// var hasStopped = false;
+	// var text = 'halma';
+	// var color = '#ffffff';
+	// var axisX = 0;
+	// var axisY = 12;
 
 	// handle mouse
 	const mouse = {
 		x: null,
 		y: null,
-		radius: 350
-	}
+		radius: 22
+	};
 
 	this.init = function () {
-		if (true) {
-			this.setup();
-		}
+		this.setup();
 	};
 
 	this.setup = function () {
 		if (app.debug) {
-			console.log("Particals started");
+			// console.log("Particals started");
 		}
-		
+
 		canvas = document.getElementById('js-particals');
 		ctx = canvas.getContext('2d');
-		var $text = document.querySelector('.control input');
-		$text.placeholder = text;
-		
+		// var $text = document.querySelector('.control input');
+		// $text.placeholder = text;
+
 		getSizes();
-		
-		window.addEventListener('mousemove', function(event) {
+
+		window.addEventListener('mousemove', function (event) {
 			mouse.x = event.x - box.x;
 			mouse.y = event.y - box.y;
 		});
-		
-		window.addEventListener('resize', function(event) {
-			getSizes();
-		});
-		
-		
-		textField = document.querySelector('#control-text__input')
-		textField.addEventListener('input', function(event) {
-			text = textField.value;
-			loadText();
-		});
-		
-		var $color = document.querySelector('#control-color__input');
-		$color.value = color;
-		$color.addEventListener('change', function(event) {
-			color = $color.value;
+
+		window.addEventListener('resize', function (event) {
+			resizeCounter++;
+			setTimeout(function () {
+				triggerAfterResize();
+			}, delay);
 		});
 
-		var $size = document.querySelector('#control-size__input');
-		$size.value = textSize;
-		$size.addEventListener('change', function(event) {
-			textSize = $size.value;
-			loadText();
-		});
-		
-		var $axisX = document.querySelector('#control-axisX__input');
-		$axisX.value = axisX;
-		$axisX.max = canvas.width/2;
-		$axisX.min = canvas.width/-2;
-		$axisX.addEventListener('change', function(event) {
-			axisX = $axisX.value;
-			loadText();
-		});
-		
-		var $axisY = document.querySelector('#control-axisY__input');
-		$axisY.max = canvas.height/2;
-		$axisY.min = canvas.height/-2;
-		$axisY.value = axisY;
-		$axisY.addEventListener('change', function(event) {
-			axisY = $axisY.value;
-			loadText();
-		});
-		
-		var $scale = document.querySelector('#control-scale__input');
-		$scale.value = scale;
-		$scale.addEventListener('change', function(event) {
-			scale = $scale.value;
-			loadText();
-		});
-		
-		var $density = document.querySelector('#control-density__input');
-		$density.value = maxDensity;
-		$density.addEventListener('change', function(event) {
-			maxDensity = $density.value;
-			loadText();
-		});
-
-		var $radius = document.querySelector('#control-radius__input');
-		$radius.value = mouse.radius;
-		$radius.addEventListener('change', function(event) {
-			mouse.radius = $radius.value;
-		});
-
-		var $dot = document.querySelector('#control-dot__input');
-		$dot.value = maxSize;
-		$dot.addEventListener('change', function(event) {
-			maxSize = $dot.value;
-		});
-		
-		var $lineMax = document.querySelector('#control-lineMax__input');
-		$lineMax.value = maxLineDistance;
-		$lineMax.addEventListener('change', function(event) {
-			maxLineDistance = $lineMax.value;
-		});
-		
-		var $lineMin = document.querySelector('#control-lineMin__input');
-		$lineMin.value = minLineDistance;
-		$lineMin.addEventListener('change', function(event) {
-			minLineDistance = $lineMin.value;
-		});
-	
-		// $text.style.opacity = 0;
 		loadText();
-
 		animate();
-	}
+		
+		function triggerAfterResize() {
+			callCounter++;
+			if (resizeCounter == callCounter) {
+				resizeCounter = 0;
+				callCounter = 0;
+				
+				var oldSizeX = canvas.width;
+				var oldSizeY = canvas.height;
+				getSizes();
+				
+				var divX = (canvas.width - oldSizeX) / 2;
+				var divY = (canvas.height - oldSizeY) / 2;
+				
+				for (var i = 0; i < particaleArray.length; i++) {
+					particaleArray[i].baseX += divX;
+					particaleArray[i].baseY += divY;
+				}
+
+				animate();
+				console.log('after');
+			}
+		}
+	};
 
 	// Start Functions
 	class Particle {
-		constructor(x, y) {
+		constructor(x, y, color) {
 			this.x = x;
 			this.y = y;
-			this.size = maxSize;
+			this.color = color;
+			this.size = scale * maxSize;
 			this.baseX = this.x;
 			this.baseY = this.y;
 			this.density = (Math.random() * maxDensity + 1);
 		}
-		
+
 		draw() {
-			ctx.fillStyle = color;
+			ctx.fillStyle = this.color;
 			ctx.beginPath();
 			ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
 			ctx.closePath();
 			ctx.fill();
 		}
-		
+
 		update() {
 			let dx = mouse.x - this.x;
 			let dy = mouse.y - this.y;
 			let distance = Math.sqrt(dx * dx + dy * dy);
-			
+
 			let forceX = dx / distance;
 			let forceY = dy / distance;
-			let maxDistance = mouse.radius;
+			let maxDistance = mouse.radius * scale;
 			let force = (maxDistance - distance) / maxDistance;
 			let directionX = forceX * force * (this.density - maxDensity);
 			let directionY = forceY * force * (this.density - maxDensity);
-			
-			if (distance < mouse.radius) {
+
+			if (distance < mouse.radius * scale) {
 				if (this.size > 0.8) {
 					this.size -= 0.4;
 				}
-				 
+
 				this.x += directionX;
 				this.y += directionY;
 			} else {
-				if (this.size <= maxSize) {
+				if (this.size <= (scale * maxSize)) {
 					this.size += 0.08;
 				}
-				 
-				if (this.x != this.baseX) {	this.x -= (this.x - this.baseX)/10; }
-				if (this.y != this.baseY) {	this.y -= (this.y - this.baseY)/10;	}
-			}
-		}
- 	}
-	
-	function initParticals() {
-		particaleArray = [];
 
-		for (var y = 0; y < imageData.height; y++) {
-			for (var x = 0; x < imageData.width; x++) {
-				if (imageData.data[(y * imageData.width + x) * 4 + 3 ] > alphaLimit) {
-					var posX = x * scale - offsetX + (parseInt(axisX) * scale);
-					var posY = y * scale - offsetY + (parseInt(axisY) * scale);
-					
-					if (particaleArray.length == 1) {
-						console.log('position:',posX, posY);
-					}
-					
-					particaleArray.push(new Particle(posX, posY));
+				if (this.x != this.baseX) {
+					this.x -= (this.x - this.baseX) / 10;
+				}
+				if (this.y != this.baseY) {
+					this.y -= (this.y - this.baseY) / 10;
 				}
 			}
 		}
 	}
-	
+
+	function initParticals() {
+		particaleArray = [];
+		var red;
+		var green;
+		var blue;
+		var color;
+		var alpha;
+		
+		console.log(particaleArray);
+
+		for (var y = 0; y < imageData.height; y++) {
+			for (var x = 0; x < imageData.width; x++) {
+				red = imageData.data[(y * imageData.width + x) * 4];
+				green = imageData.data[(y * imageData.width + x) * 4 + 1];
+				blue = imageData.data[(y * imageData.width + x) * 4 + 2];
+				alpha = imageData.data[(y * imageData.width + x) * 4 + 3];
+				if (imageData.data[(y * imageData.width + x) * 4 + 3] > alphaLimit) {
+					var posX = x * scale + ((canvas.width - (imageWidth * scale * 0.5))/ 2);
+					var posY = y * scale + ((canvas.height - (imageHeight * scale))/ 2);
+
+					// if (particaleArray.length == 1) {
+					// 	console.log('position:', posX, posY);
+					// 	console.log(red, green, blue);
+					// }
+					color = 'rgba(' + red + ', ' + green + ', ' + blue + ',' + alpha + ')';
+					particaleArray.push(new Particle(posX, posY, color));
+				}
+			}
+		}
+	}
+
 	function getSizes() {
 		box = canvas.getBoundingClientRect();
 		canvas.width = box.width;
 		canvas.height = box.height;
-		
-		offsetX = (canvas.width/2) * (scale - 1);
-		offsetY = (canvas.height/2) * (scale - 1) + ((textSize * (scale) / 4));
 	}
-	
+
 	function animate() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		for (var i = 0; i < particaleArray.length; i++) {
-			particaleArray[i].update();
-			particaleArray[i].draw();
+		if (resizeCounter == 0) {			
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			for (var i = 0; i < particaleArray.length; i++) {
+				particaleArray[i].update();
+				particaleArray[i].draw();
+			}
+			connect();
+			requestAnimationFrame(animate);
 		}
-		connect();
-		requestAnimationFrame(animate);
 	}
-	
+
 	function connect() {
 		for (var a = 0; a < particaleArray.length; a++) {
 			for (var b = a + 1; b < particaleArray.length; b++) {
 				let dx = particaleArray[a].x - particaleArray[b].x;
 				let dy = particaleArray[a].y - particaleArray[b].y;
 				let distance = Math.sqrt(dx * dx + dy * dy);
-				
-				if (distance <= maxLineDistance && distance >= minLineDistance) {
-					var opacity = 1 - distance/maxLineDistance;
-					ctx.strokeStyle = color;
+
+				if (distance <= (maxLineDistance * scale) && distance >= (minLineDistance * scale)) {
+					var opacity = 1 - distance / (maxLineDistance * scale);
+					ctx.strokeStyle = particaleArray[a].color;
 					ctx.globalAlpha = opacity;
 					ctx.lineWidth = 2;
 					ctx.beginPath();
@@ -252,17 +222,32 @@ function Particles(app) {
 			}
 		}
 	}
-	
+
 	function loadText() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		//ctx.fillStyle = color;
+		//ctx.font = textSize + 'px sans-serif';
+		//ctx.textAlign = "center";
+		//ctx.fillText(text, canvas.width / 2, canvas.height / 2 + 16, canvas.width);
 		
-		ctx.fillStyle = color;
-		ctx.font = textSize + 'px sans-serif';
-		ctx.textAlign = "center"; 
-		ctx.fillText(text, canvas.width/2 , canvas.height/2 + 16, canvas.width);
-		imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		// var img = document.getElementById('source');
+		var img = new Image();
+		img.onload = function() {
+			imageWidth = img.width;
+			imageHeight = img.height;
+			
+			var maxScaleWidth = Math.floor(canvas.width / img.width);
+			var maxScaleHeight = Math.floor(canvas.height / img.height);
+			
+			scale =  maxScaleWidth < maxScaleHeight ? maxScaleWidth : maxScaleHeight;
+			
+			ctx.drawImage(img, 0, 0);
+			// ctx.drawImage(img, (canvas.width - imageWidth)/2, (canvas.height - imageHeight)/2);
+			imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			initParticals();
+		};
 
-		initParticals();
+		img.src = imageSource;
 	}
-
 }
