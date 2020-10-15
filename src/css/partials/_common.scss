@@ -20,13 +20,13 @@ body {
 	display: flex;
 	flex-flow: column;
 	min-height: 100vh;
-	
+
 	font-kerning: normal;
 	-webkit-font-kerning: normal;
 	font-smooth: always;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	background: $black;
+	background: #2fbced;
 }
 
 .main-content {

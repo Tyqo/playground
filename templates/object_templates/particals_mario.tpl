@@ -1,5 +1,5 @@
 <div class="particals">	
-	<canvas id="js-particals" width="300" height="300" data-input='/dist/img/blazon_icon_white.png' data-type="image" data-connect="true"></canvas>
+	<canvas id="js-particals" width="300" height="300" data-input="/dist/img/mario-sprite_halma.png" data-type="image" data-connect="false"></canvas>
 </div>
 
 <!-- <img id="source" src="https://www.agentur-halma.de/dist/img/blazon_icon.png" alt=""> -->

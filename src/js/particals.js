@@ -10,31 +10,30 @@ function Particles(app) {
 	let box = null;
 	let imageData;
 
-	var scale = 7;
+	var scale = 3;
 	var maxDensity = 12;
 	var maxSize = 0.5;
+	var minSize = 0.2;
 
 	var alphaLimit = 128;
 	var maxLineDistance = 2.5;
 	var minLineDistance = 2;
 	
-	var imageWidth;
-	var imageHeight;
-	// var imageSource = 'https://www.agentur-halma.de/dist/img/blazon_icon.png';
-	var imageSource = '/dist/img/blazon_icon.png';
-
 	var delay = 1000;
 	var resizeCounter = 0;
 	var callCounter = 0;
 
-	// var textField;
-	// var textSize = 50;
-	// var isPlaying = true;
-	// var hasStopped = false;
-	// var text = 'halma';
-	// var color = '#ffffff';
-	// var axisX = 0;
-	// var axisY = 12;
+	var toUse = 'text';
+	var canConnect = false;
+
+	var imageWidth;
+	var imageHeight;
+	var imageSource = '/dist/img/blazon_icon_white.png';
+
+	var textSize = 32;
+	var text = ['Zerstreuung', 'in', 'der Corona Zeit'];
+	var color = '#ffffff';
+
 
 	// handle mouse
 	const mouse = {
@@ -54,8 +53,12 @@ function Particles(app) {
 
 		canvas = document.getElementById('js-particals');
 		ctx = canvas.getContext('2d');
-		// var $text = document.querySelector('.control input');
-		// $text.placeholder = text;
+		
+		toUse = canvas.dataset.type;
+		canConnect = JSON.parse(canvas.dataset.connect);
+		if (toUse == 'image') {
+			imageSource = canvas.dataset.input;
+		}
 
 		getSizes();
 
@@ -71,7 +74,11 @@ function Particles(app) {
 			}, delay);
 		});
 
-		loadText();
+		if (toUse == 'text') {
+			loadText();
+		} else {
+			loadImage();
+		}
 		animate();
 		
 		function triggerAfterResize() {
@@ -93,7 +100,7 @@ function Particles(app) {
 				}
 
 				animate();
-				console.log('after');
+				// console.log('after');
 			}
 		}
 	};
@@ -131,7 +138,7 @@ function Particles(app) {
 			let directionY = forceY * force * (this.density - maxDensity);
 
 			if (distance < mouse.radius * scale) {
-				if (this.size > 0.8) {
+				if (this.size > (scale * minSize)) {
 					this.size -= 0.4;
 				}
 
@@ -160,7 +167,6 @@ function Particles(app) {
 		var color;
 		var alpha;
 		
-		console.log(particaleArray);
 
 		for (var y = 0; y < imageData.height; y++) {
 			for (var x = 0; x < imageData.width; x++) {
@@ -169,13 +175,10 @@ function Particles(app) {
 				blue = imageData.data[(y * imageData.width + x) * 4 + 2];
 				alpha = imageData.data[(y * imageData.width + x) * 4 + 3];
 				if (imageData.data[(y * imageData.width + x) * 4 + 3] > alphaLimit) {
-					var posX = x * scale + ((canvas.width - (imageWidth * scale * 0.5))/ 2);
+					
+					var posX = x * scale + ((canvas.width - (imageWidth * scale))/ 2);
 					var posY = y * scale + ((canvas.height - (imageHeight * scale))/ 2);
 
-					// if (particaleArray.length == 1) {
-					// 	console.log('position:', posX, posY);
-					// 	console.log(red, green, blue);
-					// }
 					color = 'rgba(' + red + ', ' + green + ', ' + blue + ',' + alpha + ')';
 					particaleArray.push(new Particle(posX, posY, color));
 				}
@@ -196,7 +199,10 @@ function Particles(app) {
 				particaleArray[i].update();
 				particaleArray[i].draw();
 			}
-			connect();
+			
+			if (canConnect) {
+				connect();
+			}
 			requestAnimationFrame(animate);
 		}
 	}
@@ -223,15 +229,9 @@ function Particles(app) {
 		}
 	}
 
-	function loadText() {
+	function loadImage() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-		//ctx.fillStyle = color;
-		//ctx.font = textSize + 'px sans-serif';
-		//ctx.textAlign = "center";
-		//ctx.fillText(text, canvas.width / 2, canvas.height / 2 + 16, canvas.width);
 		
-		// var img = document.getElementById('source');
 		var img = new Image();
 		img.onload = function() {
 			imageWidth = img.width;
@@ -249,5 +249,29 @@ function Particles(app) {
 		};
 
 		img.src = imageSource;
+	}
+
+	function loadText() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		ctx.fillStyle = color;
+		ctx.font = 'bold ' + textSize + 'px sans-Serif';
+		ctx.textAlign = "center";
+		
+		imageWidth = 0;
+		
+		for (var i = 0; i < text.length; i++) {
+			var textWidth = text[i].length * textSize;
+			imageWidth = textWidth > imageWidth ? textWidth : imageWidth;
+		}
+		
+		for (var l = 0; l < text.length; l++) {
+			ctx.fillText(text[l], imageWidth / 2, (textSize * l) + (textSize * text.length * 0.5) , imageWidth);
+		}
+
+		imageHeight = (textSize * text.length) + (textSize * text.length * 0.5);
+
+		imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		initParticals();
 	}
 }

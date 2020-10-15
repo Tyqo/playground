@@ -10,7 +10,7 @@
 
 	{LAYOUTMODE_STARTSCRIPT}
 	{IF (!{LAYOUTMODE})}
-		<script src="dist/js/vendor/jquery.min.js"></script>
-		<script src="dist/js/main.js"></script>
+		<script src="/dist/js/vendor/jquery.min.js"></script>
+		<script src="/dist/js/main.js"></script>
 	{ENDIF}
 </head>
