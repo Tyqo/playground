@@ -16,8 +16,8 @@ function Particles(app) {
 	var minSize = 0.2;
 
 	var alphaLimit = 128;
-	var maxLineDistance = 2.5;
-	var minLineDistance = 2;
+	var maxLineDistance = 2;
+	var minLineDistance = 1.5;
 	
 	var delay = 1000;
 	var resizeCounter = 0;
@@ -209,13 +209,24 @@ function Particles(app) {
 
 	function connect() {
 		for (var a = 0; a < particaleArray.length; a++) {
+			if (Math.floor(particaleArray[a].x) == Math.floor(particaleArray[a].baseX) && Math.floor(particaleArray[a].y) == Math.floor(particaleArray[a].baseY)) {
+				continue;
+			}
+			
 			for (var b = a + 1; b < particaleArray.length; b++) {
+				
+				if (Math.floor(particaleArray[b].x) == Math.floor(particaleArray[b].baseX) && Math.floor(particaleArray[b].y) == Math.floor(particaleArray[b].baseY)) {
+					continue;
+				}
+				
 				let dx = particaleArray[a].x - particaleArray[b].x;
 				let dy = particaleArray[a].y - particaleArray[b].y;
 				let distance = Math.sqrt(dx * dx + dy * dy);
 
 				if (distance <= (maxLineDistance * scale) && distance >= (minLineDistance * scale)) {
+					// var opacity = 1 - distance / (minLineDistance * scale);
 					var opacity = 1 - distance / (maxLineDistance * scale);
+					// var opacity = (maxOpacity / minOpacity);
 					ctx.strokeStyle = particaleArray[a].color;
 					ctx.globalAlpha = opacity;
 					ctx.lineWidth = 2;
