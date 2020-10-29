@@ -5,6 +5,7 @@ html {
 body {
 	@include type-setting(0);
 	color: $text-color;
+	font-family: 'DIN', Helvetica, Arial, sans-serif;
 }
 
 .headline {

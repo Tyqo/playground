@@ -1,0 +1,77 @@
+/**
+ * src/css/partials/_webfonts.scss*
+ *
+ * @author Johannes Braun <j.braun@agentur-halma.de>
+ * @package halma
+ */
+
+$font-weights: (
+	ultra-light: 	200,
+	light: 			400,
+	condensed: 		500,
+	bold: 			700,
+	heavy: 			800,
+	black: 			900
+);
+
+$used-din-fonts: (
+	ultralight-italic: (
+		weight: map-get($font-weights, ultra-light),
+		style: italic
+	),
+	ultralight-regular: (
+		weight: map-get($font-weights, ultra-light),
+		style: normal
+	),
+	light-regular: (
+		weight: map-get($font-weights, light),
+		style: normal
+	),
+	light-italic: (
+		weight: map-get($font-weights, light),
+		style: italic
+	),
+	bold-regular: (
+		weight: map-get($font-weights, bold),
+		style: normal
+	),
+	heavy-regular: (
+		weight: map-get($font-weights, heavy),
+		style: normal
+	),
+	black-regular: (
+		weight: map-get($font-weights, black),
+		style: normal
+	)
+);
+
+@each $name, $font in $used-din-fonts {
+	@font-face {
+		font-family: "DIN";
+		font-weight: map-get($font, weight);
+		font-style: map-get($font, style);
+		font-display: swap;
+		src: url("../fonts/DIN-Next-W04-#{$name}/DIN-Next-W04-#{$name}.woff2") format("woff2"), url("../fonts/DIN-Next-W04-#{$name}/DIN-Next-W04-#{$name}.woff") format("woff");
+	}
+}
+
+@font-face {
+	font-family: Lavanderia;
+	font-weight: map-get($font-weights, bold);
+	font-display: swap;
+	src:
+		url("../fonts/lavanderia_sturdy-webfont.woff2") format("woff2"),
+		url("../fonts/lavanderia_sturdy-webfont.woff") format("woff");
+}
+
+@font-face {
+	font-family: barcode;
+	src:
+		url("../fonts/LibreBarcode39-Regular.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: snake;
+	src:
+		url("../fonts/PressStart2P-Regular.ttf") format("truetype");
+}
